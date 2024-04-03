@@ -224,7 +224,7 @@ Now it should look like this
     
 - Draw the snake and write the logic for the move() method
     
-    Create the logic for the snakes movement
+    Create the logic for the snake's movement
     
     ```java
     public void move(){
