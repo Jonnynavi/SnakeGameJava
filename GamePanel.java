@@ -37,38 +37,124 @@ public class GamePanel extends JPanel implements ActionListener {
         timer.start();
     }
     public void paintComponent(Graphics g){
-
+        super.paintComponent(g);
+        draw(g);
     }
     public void draw(Graphics g){
+        if(running) {
+            //Graph Lines
+            for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
+                g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
+                g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
+            }
 
-        for(int i = 0; i <SCREEN_HEIGHT/UNIT_SIZE;i++){
-            g.drawLine(i*UNIT_SIZE, 0, i*UNIT_SIZE,SCREEN_HEIGHT);
+            //Apples
+            g.setColor(Color.red);
+            g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
+
+            //Snake
+            for (int i = 0; i < bodyParts; i++) { //Loop through x and y array to create the snake
+                if (i == 0) { //Creates the head
+                    g.setColor(Color.green);
+                    g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+                } else {
+                    g.setColor(new Color(45, 180, 0));
+                    g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+                }
+            }
+        }else{
+            gameOver(g);
         }
     }
     public void move(){
+        for(int i = bodyParts; i > 0; i--){ //shifting the array coordinates all by one spot
+            x[i] = x[i-1];
+            y[i] = y[i-1];
+        }
 
+        switch(direction){ //Chooses the direction the head goes by adding or subtracting unit_size when key is pressed
+            case 'U':
+                y[0] = y[0] - UNIT_SIZE;
+                break;
+            case 'D':
+                y[0] = y[0] + UNIT_SIZE;
+                break;
+            case 'L':
+                x[0] = x[0] - UNIT_SIZE;
+                break;
+            case 'R':
+                x[0] = x[0] + UNIT_SIZE;
+        }
     }
     public void newApple(){ //populate the panel with new apples
-
+        appleX = random.nextInt((int)(SCREEN_WIDTH/UNIT_SIZE))*UNIT_SIZE; //randomly chooses x coordinates for apple
+        appleY = random.nextInt((int)(SCREEN_HEIGHT/UNIT_SIZE))*UNIT_SIZE;//randomly chooses y coordinates for apple
     }
-    public void checkApple(){
-
+    public void checkApple(){ //checks if snake has eaten apple
+        if(appleY == y[0] && appleX == x[0]){
+            bodyParts++;
+            applesEaten++;
+            newApple();
+        }
     }
     public void checkCollisions(){
+        //checks if head collides with body
+        for(int i = bodyParts; i>0; i--){
+            if(x[0] == x[i] && y[0] == y[i]){
+                running = false;
+            }
+        }
+        //checks if head touches left or right border
+        if((x[0]<0) || x[0]>SCREEN_WIDTH){
+            running = false;
+        }
+        //checks if head touches top or bottom border
+        if(y[0]<0 || y[0]>SCREEN_HEIGHT){
+            running = false;
+        }
 
+        if(!running){
+            timer.stop();
+        }
     }
     public void gameOver(Graphics g){
-
+        
     }
     @Override
-    public void actionPerformed(ActionEvent e) {
-
+    public void actionPerformed(ActionEvent e) { //this invokes when a action occurs aka whenever I press a key
+        if(running){
+            move(); //snake movement
+            checkApple(); //checks if apple has been eaten
+            checkCollisions(); //check if snake has collided with walls or itself
+        }
+        repaint();
     }
 
     public class MyKeyAdapter extends KeyAdapter{ //Allows java to recognize key presses
         @Override
         public void keyPressed(KeyEvent e) {
-            super.keyPressed(e);
+            switch(e.getKeyCode()){
+                case KeyEvent.VK_LEFT:
+                    if(direction != 'R'){ //Only allows 90 degree turns
+                        direction = 'L';
+                    }
+                    break;
+                case KeyEvent.VK_UP:
+                    if(direction != 'D'){ //Only allows 90 degree turns
+                        direction = 'U';
+                    }
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    if(direction != 'L'){ //Only allows 90 degree turns
+                        direction = 'R';
+                    }
+                    break;
+                case KeyEvent.VK_DOWN:
+                    if(direction != 'U'){ //Only allows 90 degree turns
+                        direction = 'D';
+                    }
+                    break;
+            }
         }
     }
 }
