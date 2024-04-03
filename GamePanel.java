@@ -62,7 +62,11 @@ public class GamePanel extends JPanel implements ActionListener {
                     g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
                 }
             }
+
+            //Score Board
+            scoreCounter(g);
         }else{
+            scoreCounter(g);
             gameOver(g);
         }
     }
@@ -117,8 +121,17 @@ public class GamePanel extends JPanel implements ActionListener {
             timer.stop();
         }
     }
+    public void scoreCounter(Graphics g){
+        g.setColor(Color.red);
+        g.setFont(new Font("Ink Free", Font.BOLD, 25));
+        FontMetrics metrics = getFontMetrics(g.getFont()); //Allow us the get the metrics for a specific font
+        g.drawString("Score: " + applesEaten, (SCREEN_WIDTH - metrics.stringWidth("Score: "+ applesEaten))/2,g.getFont().getSize());
+    }
     public void gameOver(Graphics g){
-        
+        g.setColor(Color.red);
+        g.setFont(new Font("Ink Free", Font.BOLD, 75));
+        FontMetrics metrics = getFontMetrics(g.getFont()); //Allow us the get the metrics for a specific font
+        g.drawString("Game Over", (SCREEN_WIDTH - metrics.stringWidth("Game Over"))/2,SCREEN_HEIGHT/2); //allows us to put the text at the center
     }
     @Override
     public void actionPerformed(ActionEvent e) { //this invokes when a action occurs aka whenever I press a key
